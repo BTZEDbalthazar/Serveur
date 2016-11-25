@@ -3,7 +3,7 @@ import tornado.web
 import logging
 import time
 import cv2
-
+# import video
 import StringIO
 import wave
 import time
@@ -11,6 +11,7 @@ import angus
 import base64
 import zlib
 import subprocess
+import os
 
 def decode_output(sound, filename):
 	sound = base64.b64decode(sound)
@@ -61,18 +62,22 @@ class MainHandler(tornado.web.RequestHandler):
 			if self.database["gender"] == "male":
 				img = cv2.imread("homme.jpg",0)
 				cv2.imshow("pub",img )  
-				phrase= "Hi man, Look at this beautiful watch!! I'm sure that it be very well to you! You have to buy it!"				               
+				phrase= "Hi man, Look at this beautiful watch!! I'm sure it look very good on you! You have to buy it!"				               
 			elif self.database["gender"] == "female":       
 				img1 = cv2.imread("femme.jpg",0)
 				cv2.imshow("pub",img1 )
-				phrase= "Hi girl, Look at this beautiful watch!! I'm sure that it be very well to you! You have to buy it!"
+				phrase= "Hi girl, Look at this beautiful watch!! I'm sure it look very good on you! You have to buy it!"
 			cv2.waitKey(1)
 		
 			if self.database["lastgender"] != self.database["gender"] :
 				job = service.process({'text': phrase, 'lang' : "en-US"})
 				decode_output(job.result["sound"], "output.wav")
-				subprocess.call(["/usr/bin/aplay", "./output.wav"])
+				subprocess.Popen(["/usr/bin/aplay","./output.wav"])
+				# video.play()
+				subprocess.Popen(["python", "video.py"])
+				# os.system("python video.py")
 			self.database["lastgender"]= self.database["gender"]
+
 
 mydatabase = dict()
 mydatabase["last_react"]=0
